@@ -1,0 +1,16 @@
+name: CI
+on: [push]
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  env:
+    name: Environment
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Print environment
+        run: env
