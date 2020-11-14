@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-      - run: apt install qemu-system-x86 cloud-image-utils
+      - run: sudo apt install qemu-system-x86 cloud-image-utils
       - run: |
           set -e
           wget https://cloud-images.ubuntu.com/focal/current/focal-server-cloudimg-amd64.img
