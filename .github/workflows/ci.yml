@@ -9,12 +9,14 @@ jobs:
   vm:
     name: Ubuntu VM
     runs-on: ubuntu-20.04
+
+    timeout-minutes: 20
     
     steps:
       - run: sudo apt install qemu-system-x86 cloud-image-utils
+      - run: wget https://cloud-images.ubuntu.com/focal/current/focal-server-cloudimg-amd64.img
       - run: |
           set -e
-          wget https://cloud-images.ubuntu.com/focal/current/focal-server-cloudimg-amd64.img
           
           # https://serverfault.com/a/940686
           # https://github.com/canonical/cloud-init/blob/master/doc/examples/cloud-config.txt
@@ -31,4 +33,12 @@ jobs:
             -drive file=user-data.img,format=raw \
             -m 2G \
             -nic user,hostfwd=tcp:127.0.0.1:2222-:22 \
-            -nographic
+            -nographic &>/dev/null </dev/null &
+             
+          while pgrep qemu-system &>/dev/null; do
+            if timeout 30 ssh -p 2222 ubuntu@localhost true; then
+              break
+            fi
+          done
+          
+          ssh -p 2222 ubuntu@localhost 'ls'
