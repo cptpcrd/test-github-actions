@@ -6,11 +6,29 @@ defaults:
     shell: bash
 
 jobs:
-  env:
-    name: Environment
-
+  vm:
+    name: Ubuntu VM
     runs-on: ubuntu-latest
-
+    
     steps:
-      - name: Print environment
-        run: env
+      - run: apt install qemu-system-x86 cloud-image-utils
+      - run: |
+          set -e
+          wget https://cloud-images.ubuntu.com/focal/current/focal-server-cloudimg-amd64.img
+          
+          # https://serverfault.com/a/940686
+          # https://github.com/canonical/cloud-init/blob/master/doc/examples/cloud-config.txt
+          ssh-keygen -t rsa -b 4096 -N "" -C "bedrock@github.com" -f ~/.ssh/id_rsa
+          cat >user-data <<EOF
+          #cloud-config
+          ssh_authorized_keys:
+            - $(cat ~/.ssh/id_rsa.pub)
+          EOF
+          cloud-localds user-data.img user-data
+          
+          qemu-system-x86_64 \
+            -drive file=focal-server-cloudimg-amd64.img,format=qcow2 \
+            -drive file=user-data.img,format=raw \
+            -m 2G \
+            -nic user,hostfwd=tcp:127.0.0.1:2222-:22 \
+            -nographic
