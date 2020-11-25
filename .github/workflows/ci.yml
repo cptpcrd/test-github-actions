@@ -42,3 +42,24 @@ jobs:
           done
           
           ssh -p 2222 ubuntu@localhost 'ls'
+          
+  test-rust-install:
+    name: Test rust install
+    
+    strategy:
+      fail-fast: true
+      matrix:
+        os: [ubuntu-16.04, ubuntu-18.04, ubuntu-20.04]
+        
+    steps:
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+      
+      - uses: cptpcrd/install@master
+        with:
+          crate: cargo-tarpaulin
+          version: latest
+          use-tool-cache: true
+    
+    runs-on: ${{ matrix.os }}
