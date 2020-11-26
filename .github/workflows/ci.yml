@@ -13,7 +13,7 @@ jobs:
     timeout-minutes: 20
     
     steps:
-      - run: sudo apt install qemu-system-x86 cloud-image-utils
+      - run: sudo apt-get update && sudo apt-get install qemu-system-x86 cloud-image-utils
       - run: wget https://cloud-images.ubuntu.com/focal/current/focal-server-cloudimg-amd64.img
       - run: |
           set -e
@@ -42,24 +42,3 @@ jobs:
           done
           
           ssh -p 2222 ubuntu@localhost 'ls'
-          
-  test-rust-install:
-    name: Test rust install
-    
-    strategy:
-      fail-fast: true
-      matrix:
-        os: [ubuntu-16.04, ubuntu-18.04, ubuntu-20.04]
-        
-    steps:
-      - uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-      
-      - uses: cptpcrd/install@master
-        with:
-          crate: cargo-tarpaulin
-          version: latest
-          use-tool-cache: true
-    
-    runs-on: ${{ matrix.os }}
