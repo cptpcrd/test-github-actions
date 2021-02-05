@@ -1,0 +1,22 @@
+task:
+  name: FreeBSD $FREEBSD_VERSION ($TOOLCHAIN)
+
+  freebsd_instance:
+    cpu: 1
+    image_family: $FREEBSD_IMAGE
+
+  matrix:
+    - env:
+        FREEBSD_VERSION: 12.2
+        FREEBSD_IMAGE: freebsd-12-2
+    - env:
+        FREEBSD_VERSION: 12.2 STABLE
+        FREEBSD_IMAGE: freebsd-12-2-snap
+    # - env:
+    #     FREEBSD_VERSION: 13.0
+    #     FREEBSD_IMAGE: freebsd-13-0-snap
+    
+  test_script:
+    - pkg install -y python38
+    - python3.8 -c "import os, socket; print(os.uname(), repr(socket.gethostname()))"
+    
