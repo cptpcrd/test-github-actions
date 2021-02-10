@@ -36,9 +36,10 @@ jobs:
             -nographic &>/dev/null </dev/null &
              
           while pgrep qemu-system &>/dev/null; do
-            if timeout 30 ssh -p 2222 ubuntu@localhost true; then
+            if timeout 10 ssh -o StrictHostKeyChecking=accept-new -p 2222 ubuntu@localhost true; then
               break
             fi
+            sleep 30
           done
           
           ssh -p 2222 ubuntu@localhost 'ls'
