@@ -6,19 +6,6 @@ defaults:
     shell: bash
 
 jobs:
-  basic_test:
-    runs-on: ubuntu-20.04
-    strategy:
-      matrix:
-        cmd:
-          - 'true; echo a; true'
-          - 'false; echo a; true'
-          - 'set -e; true; echo a; true'
-          - 'set -e; false; echo a; true'
-
-    steps:
-      - run: ${{ matrix.cmd }}
-     
   vm:
     name: Ubuntu VM
     runs-on: ubuntu-20.04
@@ -26,11 +13,13 @@ jobs:
     timeout-minutes: 20
     
     steps:
-      - run: sudo apt-get update && sudo apt-get install qemu-system-x86 cloud-image-utils
-      - run: wget https://cloud-images.ubuntu.com/focal/current/focal-server-cloudimg-amd64.img
-      - run: |
-          set -e
-          
+      - name: Install dependencies
+        run: sudo apt-get update && sudo apt-get install qemu-system-x86 cloud-image-utils
+      - name: Download Ubuntu image
+        run: wget https://cloud-images.ubuntu.com/focal/current/focal-server-cloudimg-amd64.img
+        
+      - name: Create cloud-init image file
+        run: |
           # https://serverfault.com/a/940686
           # https://github.com/canonical/cloud-init/blob/master/doc/examples/cloud-config.txt
           ssh-keygen -t rsa -b 4096 -N "" -C "bedrock@github.com" -f ~/.ssh/id_rsa
@@ -41,8 +30,8 @@ jobs:
           EOF
           cloud-localds user-data.img user-data
           
-      - run: |
-          set -e
+      - name: Start VM
+        run: |
           qemu-system-x86_64 \
             -drive file=focal-server-cloudimg-amd64.img,format=qcow2 \
             -drive file=user-data.img,format=raw \
@@ -50,14 +39,18 @@ jobs:
             -nic user,hostfwd=tcp:127.0.0.1:2222-:22 \
             -nographic &>/dev/null </dev/null &
 
+      - name: Wait for VM to boot
+        run: |
           while pgrep qemu-system &>/dev/null; do
             if timeout 15 ssh -o StrictHostKeyChecking=accept-new -p 2222 ubuntu@localhost true; then
               break
             fi
             sleep 10
           done
-          
-          ssh -p 2222 ubuntu@localhost sh -c '
+      
+      - name: Run commands on VM
+        run: |
+          ssh -p 2222 ubuntu@localhost '
           ls -la .
           lsb_release -a
           '
