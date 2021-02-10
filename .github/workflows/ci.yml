@@ -15,6 +15,9 @@ jobs:
           - 'false; echo a; true'
           - 'set -e; true; echo a; true'
           - 'set -e; false; echo a; true'
+
+    steps:
+      - run: ${{ matrix.cmd }}
      
   vm:
     name: Ubuntu VM
