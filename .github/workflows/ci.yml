@@ -6,6 +6,16 @@ defaults:
     shell: bash
 
 jobs:
+  basic_test:
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        cmd:
+          - 'true; echo a; true'
+          - 'false; echo a; true'
+          - 'set -e; true; echo a; true'
+          - 'set -e; false; echo a; true'
+     
   vm:
     name: Ubuntu VM
     runs-on: ubuntu-20.04
@@ -28,18 +38,20 @@ jobs:
           EOF
           cloud-localds user-data.img user-data
           
+      - run: |
+          set -e
           qemu-system-x86_64 \
             -drive file=focal-server-cloudimg-amd64.img,format=qcow2 \
             -drive file=user-data.img,format=raw \
             -m 2G \
             -nic user,hostfwd=tcp:127.0.0.1:2222-:22 \
             -nographic &>/dev/null </dev/null &
-             
+
           while pgrep qemu-system &>/dev/null; do
-            if timeout 10 ssh -o StrictHostKeyChecking=accept-new -p 2222 ubuntu@localhost true; then
+            if timeout 15 ssh -o StrictHostKeyChecking=accept-new -p 2222 ubuntu@localhost true; then
               break
             fi
-            sleep 30
+            sleep 10
           done
           
           ssh -p 2222 ubuntu@localhost sh -c '
