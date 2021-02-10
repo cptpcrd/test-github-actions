@@ -42,4 +42,7 @@ jobs:
             sleep 30
           done
           
-          ssh -p 2222 ubuntu@localhost 'ls'
+          ssh -p 2222 ubuntu@localhost sh -c '
+          ls -la .
+          lsb_release -a
+          '
