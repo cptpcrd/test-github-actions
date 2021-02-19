@@ -61,7 +61,7 @@ jobs:
         uses: actions-rs/install@v0.1
         with:
           crate: grcov
-          version: latest
+          version: 0.7.1
 
       - name: Run grcov
         run: grcov . --binary-path ./target/debug/deps/ -s . -t lcov --branch --ignore-not-existing --ignore "/*" -o lcov.info
