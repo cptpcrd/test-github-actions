@@ -47,6 +47,16 @@ jobs:
           RUSTFLAGS: -Zinstrument-coverage
           LLVM_PROFILE_FILE: "coverage-%p-%m.profraw"
 
+      - name: Run executable
+        uses: actions-rs/cargo@v1
+        with:
+          toolchain: ${{ matrix.toolchain }}
+          command: run
+          args: --verbose --target ${{ matrix.target }}
+        env:
+          RUSTFLAGS: -Zinstrument-coverage
+          LLVM_PROFILE_FILE: "coverage-%p-%m.profraw"
+
       - name: Install grcov
         uses: actions-rs/install@v0.1
         with:
