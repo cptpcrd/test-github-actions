@@ -1,3 +1,7 @@
+fn main() {
+    a();
+}
+
 fn a() -> bool {
     true
 }
