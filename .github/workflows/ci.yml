@@ -47,14 +47,10 @@ jobs:
           RUSTFLAGS: -Zinstrument-coverage
           LLVM_PROFILE_FILE: "coverage-%p-%m.profraw"
 
-      - name: Install grcov
-        uses: actions-rs/install@v0.1
-        with:
-          crate: grcov
-          version: latest
+      - run: curl -L https://github.com/mozilla/grcov/releases/latest/download/grcov-linux-x86_64.tar.bz2 | tar jxf -
 
       - name: Run grcov
-        run: grcov . --binary-path ./target/debug/deps/ -s . -t lcov --branch --ignore-not-existing --ignore "/*" -o lcov.info
+        run: ./grcov . --binary-path ./target/debug/deps/ -s . -t lcov --branch --ignore-not-existing --ignore "/*" -o lcov.info
 
       - run: cat lcov.info
 
