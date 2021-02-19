@@ -47,7 +47,16 @@ jobs:
           RUSTFLAGS: -Zinstrument-coverage
           LLVM_PROFILE_FILE: "coverage-%p-%m.profraw"
 
-      - run: curl -L https://github.com/mozilla/grcov/releases/latest/download/grcov-linux-x86_64.tar.bz2 | tar jxf -
+      - run: |
+          case ${{ matrix.os }} in
+            macos*)
+              os_name=osx
+              ;;
+            *)
+              os_name=linux
+              ;;
+          esac
+          curl -L https://github.com/mozilla/grcov/releases/latest/download/grcov-${os_name}-x86_64.tar.bz2 | tar jxf -
 
       - name: Run grcov
         run: ./grcov . --binary-path ./target/debug/deps/ -s . -t lcov --branch --ignore-not-existing --ignore "/*" -o lcov.info
