@@ -19,4 +19,5 @@ task:
   test_script:
     - pkg install -y python38
     - python3.8 -c "import os, socket; print(os.uname(), repr(socket.gethostname()))"
-    
+    - pwd
+    - ls -la
